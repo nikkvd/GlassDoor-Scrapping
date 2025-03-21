@@ -10,11 +10,26 @@ import pandas as pd
 import os
 from datetime import datetime
 import chromedriver_autoinstaller
+import streamlit as st
 
 
 def scrape_glassdoor_reviews(company_name, email, password,max_page = 5):
-# Install ChromeDriver automatically
-    chromedriver_autoinstaller.install()
+# Debug: Check environment
+    st.write("Current working directory:", os.getcwd())
+    st.write("Chromium version:", os.popen("chromium --version").read())
+
+    # Set a writable directory for ChromeDriver to avoid PermissionError
+    chromedriver_dir = "/tmp/chromedriver"
+    try:
+        if not os.path.exists(chromedriver_dir):
+            os.makedirs(chromedriver_dir)
+        chromedriver_path = chromedriver_autoinstaller.install(path=chromedriver_dir)
+        st.write("ChromeDriver installed at:", chromedriver_path)
+    except PermissionError as e:
+        st.error(f"Permission denied while installing ChromeDriver: {str(e)}")
+        # Fallback to system-installed ChromeDriver
+        chromedriver_path = "/usr/bin/chromedriver"
+        st.write("Falling back to system ChromeDriver:", chromedriver_path)
 
     # Configure Chrome options for Streamlit Cloud
     options = webdriver.ChromeOptions()
@@ -22,12 +37,14 @@ def scrape_glassdoor_reviews(company_name, email, password,max_page = 5):
     options.add_argument("--headless")  # Run in headless mode (no GUI)
     options.add_argument("--no-sandbox")  # Required for containerized environments
     options.add_argument("--disable-dev-shm-usage")  # Avoid shared memory issues
-    options.add_argument("--disable-gpu")  # Disable GPU acceleration (optional)
+    options.add_argument("--disable-gpu")  # Disable GPU acceleration
 
-    # Initialize the WebDriver
+    # Initialize the WebDriver with explicit ChromeDriver path
     try:
-        driver = webdriver.Chrome(options=options)
+        driver = webdriver.Chrome(executable_path=chromedriver_path, options=options)
+        st.write("WebDriver initialized successfully!")
     except Exception as e:
+        st.error(f"Failed to initialize WebDriver: {str(e)}")
         raise Exception(f"Failed to initialize WebDriver: {str(e)}")
     
     # Set up WebDriverWait
