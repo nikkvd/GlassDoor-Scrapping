@@ -41,7 +41,8 @@ def scrape_glassdoor_reviews(company_name, email, password,max_page = 5):
 
     # Initialize the WebDriver with explicit ChromeDriver path
     try:
-        driver = webdriver.Chrome(executable_path=chromedriver_path, options=options)
+        service = Service(executable_path=chromedriver_path)
+        driver = webdriver.Chrome(service=service, options=options)
         st.write("WebDriver initialized successfully!")
     except Exception as e:
         st.error(f"Failed to initialize WebDriver: {str(e)}")
