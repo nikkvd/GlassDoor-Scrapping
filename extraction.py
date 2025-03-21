@@ -55,7 +55,7 @@ def scrape_glassdoor_reviews(company_name, email, password,max_page = 5):
         base_url = "https://www.glassdoor.co.in"
         print(f"Opening Glassdoor at {base_url}...")
         driver.get(base_url)
-        time.sleep()
+        time.sleep(10)
         print("Current URL:", driver.current_url)
         print("Page title:", driver.title)
         
