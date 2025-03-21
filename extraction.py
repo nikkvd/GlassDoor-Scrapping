@@ -9,6 +9,7 @@ import time
 import pandas as pd
 import os
 from datetime import datetime
+import chromedriver_autoinstaller
 
 # Specify a writable directory for ChromeDriver
 chromedriver_dir = "/tmp/chromedriver"
