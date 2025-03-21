@@ -13,18 +13,22 @@ import chromedriver_autoinstaller
 
 
 def scrape_glassdoor_reviews(company_name, email, password,max_page = 5):
+# Install ChromeDriver automatically
+    chromedriver_autoinstaller.install()
+
+    # Configure Chrome options for Streamlit Cloud
     options = webdriver.ChromeOptions()
-    options.binary_location = "/usr/bin/chromium"  # Point to Chromium binary
-    options.add_argument("--start-maximized")  # Your original argument
-    options.add_argument("--headless")  # Required for Streamlit Cloud (no GUI)
+    options.binary_location = "/usr/bin/chromium"  # Location of Chromium in Streamlit Cloud
+    options.add_argument("--headless")  # Run in headless mode (no GUI)
     options.add_argument("--no-sandbox")  # Required for containerized environments
     options.add_argument("--disable-dev-shm-usage")  # Avoid shared memory issues
-    
-    # Initialize the driver with ChromeDriverManager
-    driver = webdriver.Chrome(
-        service=Service(ChromeDriverManager().install()),
-        options=options
-    )
+    options.add_argument("--disable-gpu")  # Disable GPU acceleration (optional)
+
+    # Initialize the WebDriver
+    try:
+        driver = webdriver.Chrome(options=options)
+    except Exception as e:
+        raise Exception(f"Failed to initialize WebDriver: {str(e)}")
     
     # Set up WebDriverWait
     wait = WebDriverWait(driver, 30)
