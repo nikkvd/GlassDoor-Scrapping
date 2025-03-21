@@ -7,10 +7,15 @@ from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 import time
 import pandas as pd
+import os
 from datetime import datetime
 
-import chromedriver_autoinstaller
-chromedriver_autoinstaller.install() 
+# Specify a writable directory for ChromeDriver
+chromedriver_dir = "/tmp/chromedriver"
+os.makedirs(chromedriver_dir, exist_ok=True)  # Create the directory if it doesn’t exist
+
+# Install ChromeDriver to the custom directory
+chromedriver_path = chromedriver_autoinstaller.install(path=chromedriver_dir)
 
 def scrape_glassdoor_reviews(company_name, email, password,max_page = 5):
     options = webdriver.ChromeOptions()
