@@ -38,6 +38,13 @@ def scrape_glassdoor_reviews(company_name, email, password,max_page = 5):
     options.add_argument("--no-sandbox")  # Required for containerized environments
     options.add_argument("--disable-dev-shm-usage")  # Avoid shared memory issues
     options.add_argument("--disable-gpu")  # Disable GPU acceleration
+    # Enhanced anti-detection
+    options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+    options.add_argument("--disable-blink-features=AutomationControlled")
+    options.add_experimental_option("excludeSwitches", ["enable-automation"])
+    options.add_argument("--window-size=1920,1080")  # Set a realistic window size
+    options.add_argument("--disable-infobars")  # Hide info bars
+    options.add_argument("--start-maximized")  # Maximize window (simulated)
 
     # Initialize the WebDriver with explicit ChromeDriver path
     try:
