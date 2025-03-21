@@ -16,55 +16,64 @@ import streamlit as st
 def scrape_glassdoor_reviews(company_name, email, password,max_page = 5):
 # Debug: Check environment
     st.write("Current working directory:", os.getcwd())
-    st.write("Chromium version:", os.popen("chromium --version").read())
+    st.write("Chromium version (if available):", os.popen("chromium --version").read() or "Not detected")
 
-    # Set a writable directory for ChromeDriver to avoid PermissionError
+    # Install ChromeDriver in a writable directory
     chromedriver_dir = "/tmp/chromedriver"
     try:
         if not os.path.exists(chromedriver_dir):
             os.makedirs(chromedriver_dir)
         chromedriver_path = chromedriver_autoinstaller.install(path=chromedriver_dir)
         st.write("ChromeDriver installed at:", chromedriver_path)
-    except PermissionError as e:
-        st.error(f"Permission denied while installing ChromeDriver: {str(e)}")
-        # Fallback to system-installed ChromeDriver
-        chromedriver_path = "/usr/bin/chromedriver"
+    except Exception as e:
+        st.error(f"Error installing ChromeDriver: {str(e)}")
+        chromedriver_path = "/usr/bin/chromedriver"  # Fallback to system-installed
         st.write("Falling back to system ChromeDriver:", chromedriver_path)
 
-    # Configure Chrome options for Streamlit Cloud
+    # Configure Chrome options (default to Chromium in Streamlit Cloud)
     options = webdriver.ChromeOptions()
-    options.binary_location = "/usr/bin/chromium"  # Location of Chromium in Streamlit Cloud
-    options.add_argument("--headless")  # Run in headless mode (no GUI)
-    options.add_argument("--no-sandbox")  # Required for containerized environments
-    options.add_argument("--disable-dev-shm-usage")  # Avoid shared memory issues
-    options.add_argument("--disable-gpu")  # Disable GPU acceleration
-    # Enhanced anti-detection
+    # Remove binary_location to make it browser-agnostic; rely on PATH or default
+    options.add_argument("--headless")  # Required for Streamlit Cloud
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--disable-gpu")
     options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
     options.add_argument("--disable-blink-features=AutomationControlled")
     options.add_experimental_option("excludeSwitches", ["enable-automation"])
-    options.add_argument("--window-size=1920,1080")  # Set a realistic window size
-    options.add_argument("--disable-infobars")  # Hide info bars
-    options.add_argument("--start-maximized")  # Maximize window (simulated)
+    options.add_argument("--window-size=1920,1080")
+    options.add_argument("--disable-infobars")
+    options.add_argument("--start-maximized")
 
-    # Initialize the WebDriver with explicit ChromeDriver path
+    # Initialize WebDriver
     try:
         service = Service(executable_path=chromedriver_path)
         driver = webdriver.Chrome(service=service, options=options)
         st.write("WebDriver initialized successfully!")
     except Exception as e:
         st.error(f"Failed to initialize WebDriver: {str(e)}")
-        raise Exception(f"Failed to initialize WebDriver: {str(e)}")
-    
-    # Set up WebDriverWait
+        return pd.DataFrame()
+
     wait = WebDriverWait(driver, 30)
-    
+
     try:
         base_url = "https://www.glassdoor.co.in"
-        print(f"Opening Glassdoor at {base_url}...")
+        st.write(f"Opening Glassdoor at {base_url}...")
         driver.get(base_url)
         time.sleep(10)
-        print("Current URL:", driver.current_url)
-        print("Page title:", driver.title)
+        st.write("Current URL:", driver.current_url)
+        st.write("Page title:", driver.title)
+
+        # Handle Cloudflare
+        if "just a moment" in driver.title.lower():
+            st.warning("Detected Cloudflare verification page. Waiting for resolution...")
+            time.sleep(20)
+            st.write("Updated URL after wait:", driver.current_url)
+            st.write("Updated page title:", driver.title)
+            if "just a moment" in driver.title.lower():
+                st.error("Failed to bypass Cloudflare verification.")
+                st.write("Page source:", driver.page_source[:1000])
+                driver.quit()
+                return pd.DataFrame()
         
         # with open("page_source_initial.html", "w", encoding="utf-8") as f:
         #     f.write(driver.page_source)
