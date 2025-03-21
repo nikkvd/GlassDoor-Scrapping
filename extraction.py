@@ -11,17 +11,22 @@ import os
 from datetime import datetime
 import chromedriver_autoinstaller
 
-# Specify a writable directory for ChromeDriver
-chromedriver_dir = "/tmp/chromedriver"
-os.makedirs(chromedriver_dir, exist_ok=True)  # Create the directory if it doesn’t exist
-
-# Install ChromeDriver to the custom directory
-chromedriver_path = chromedriver_autoinstaller.install(path=chromedriver_dir)
 
 def scrape_glassdoor_reviews(company_name, email, password,max_page = 5):
     options = webdriver.ChromeOptions()
-    options.add_argument("--start-maximized")
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+    options.binary_location = "/usr/bin/chromium"  # Point to Chromium binary
+    options.add_argument("--start-maximized")  # Your original argument
+    options.add_argument("--headless")  # Required for Streamlit Cloud (no GUI)
+    options.add_argument("--no-sandbox")  # Required for containerized environments
+    options.add_argument("--disable-dev-shm-usage")  # Avoid shared memory issues
+    
+    # Initialize the driver with ChromeDriverManager
+    driver = webdriver.Chrome(
+        service=Service(ChromeDriverManager().install()),
+        options=options
+    )
+    
+    # Set up WebDriverWait
     wait = WebDriverWait(driver, 30)
     
     try:
