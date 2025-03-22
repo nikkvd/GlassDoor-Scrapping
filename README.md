@@ -33,6 +33,7 @@ streamlit run app.py
 - Enter the **company name** in the input field.
 - (Optional) Specify the number of pages to extract (default is 5 pages).
 - Click the **Extract** button.
+  
 ![Step1](Images/typed.png)
 
 
@@ -47,16 +48,21 @@ streamlit run app.py
   - **Advice to Management**
 - The extraction continues until the specified number of pages is reached.
 - Login
+  
   ![login](Images/login.png)
 - Search
+  
   ![search](Images/search-result.png)
 - Company Profile
+  
   ![company](Images/review-tag.png)
 - Review Extraction
+  
   ![extraction](Images/extraction.png)
 - After completion, the browser window **automatically closes**.
 - The first 5 records of the extracted dataset are displayed in the Streamlit app.
 - A **Download Dataset** button is provided to download the full dataset.
+  
 ![extraction_complete](Images/result-extraction.png)
 
 ### 4. Sentiment Analysis
@@ -66,6 +72,7 @@ streamlit run app.py
   - **Cons Sentiment Score**
   - **Combined Score (Pros - Cons)**
 - Sentiment scores are displayed in circular charts.
+  
 ![sentiment](Images/result-sentiment-1.png)
 
 ### 5. AI-Generated Insights & Recommendations
@@ -74,6 +81,7 @@ streamlit run app.py
   - An **overall observation** of the company’s reviews.
   - **Recommendations** based on the extracted insights.
 - The results are displayed in the Streamlit app.
+
 ![observe1](Images/result-sentiment-2.png)
 ![observe2](Images/result-sentiment-3.png)
 
