@@ -11,6 +11,7 @@ import os
 from datetime import datetime
 import chromedriver_autoinstaller
 import streamlit as st
+from seleniumbase import SB
 
 
 def scrape_glassdoor_reviews(company_name, email, password,max_page = 5):
