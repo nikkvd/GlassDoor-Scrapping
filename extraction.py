@@ -14,74 +14,44 @@ import streamlit as st
 
 
 def scrape_glassdoor_reviews(company_name, email, password,max_page = 5):
-# Detect if running in Streamlit Cloud (headless) or locally (visible)
-    is_streamlit_cloud = 'STREAMLIT_CLOUD' in os.environ or os.path.exists('/mount/src')
-    st.write("Running in Streamlit Cloud:", is_streamlit_cloud)
-
-    # Debug: Check environment
-    st.write("Current working directory:", os.getcwd())
-    st.write("Chromium version (if available):", os.popen("chromium --version").read() or "Not detected")
-
-    # Install ChromeDriver
-    chromedriver_dir = "/tmp/chromedriver" if is_streamlit_cloud else None
-    try:
-        chromedriver_path = chromedriver_autoinstaller.install(path=chromedriver_dir)
-        st.write("ChromeDriver installed at:", chromedriver_path)
-    except Exception as e:
-        st.error(f"Error installing ChromeDriver: {str(e)}")
-        chromedriver_path = "/usr/bin/chromedriver" if is_streamlit_cloud else None
-        st.write("Falling back to system ChromeDriver:", chromedriver_path)
-
-    # Configure Chrome options
-    options = webdriver.ChromeOptions()
-    if is_streamlit_cloud:
-        # Headless mode for Streamlit Cloud
-        options.add_argument("--headless")
-        options.add_argument("--no-sandbox")
-        options.add_argument("--disable-dev-shm-usage")
-        options.add_argument("--disable-gpu")
-    else:
-        # Visible mode locally
-        options.add_argument("--start-maximized")
-    
-    options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
-    options.add_argument("--disable-blink-features=AutomationControlled")
-    options.add_experimental_option("excludeSwitches", ["enable-automation"])
-    options.add_argument("--window-size=1920,1080")
-    options.add_argument("--disable-infobars")
-
-    # Initialize WebDriver
-    try:
-        service = Service(executable_path=chromedriver_path)
-        driver = webdriver.Chrome(service=service, options=options)
+# Configure SeleniumBase for Streamlit Cloud (headless, stealth mode)
+    with SB(
+        uc=True,  # Undetected-chromedriver mode to evade bot detection
+        headless=True,  # Mandatory for Streamlit Cloud
+        binary_location="/usr/bin/chromium",  # Streamlit Cloud's Chromium path
+        extra_args=[
+            "--no-sandbox",
+            "--disable-dev-shm-usage",
+            "--disable-gpu",
+            "--disable-infobars",
+            "--window-size=1920,1080",
+            "--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "--disable-blink-features=AutomationControlled",
+        ]
+    ) as driver:
         st.write("WebDriver initialized successfully!")
-    except Exception as e:
-        st.error(f"Failed to initialize WebDriver: {str(e)}")
-        return pd.DataFrame()
-
-    wait = WebDriverWait(driver, 30)
-
-    try:
-        base_url = "https://www.glassdoor.co.in"
-        st.write(f"Opening Glassdoor at {base_url}...")
-        driver.get(base_url)
-        time.sleep(10)
-        if not is_streamlit_cloud:
-            driver.execute_script("window.scrollTo(0, document.body.scrollHeight / 2);")
+        try:
+            base_url = "https://www.glassdoor.co.in"
+            st.write(f"Opening Glassdoor at {base_url}...")
+            driver.get(base_url)
+            time.sleep(10)  # Initial wait for Cloudflare
+            driver.execute_script("window.scrollTo(0, document.body.scrollHeight / 2);")  # Mimic human scrolling
             time.sleep(2)
-        st.write("Current URL:", driver.current_url)
-        st.write("Page title:", driver.title)
+            st.write("Current URL:", driver.current_url)
+            st.write("Page title:", driver.title)
 
-        if "just a moment" in driver.title.lower():
-            st.warning("Detected Cloudflare verification page. Waiting for resolution...")
-            time.sleep(20)
-            st.write("Updated URL after wait:", driver.current_url)
-            st.write("Updated page title:", driver.title)
-            st.write("Page source:", driver.page_source[:1000])
+            # Handle Cloudflare
             if "just a moment" in driver.title.lower():
-                st.error("Failed to bypass Cloudflare verification.")
-                driver.quit()
-                return pd.DataFrame()
+                st.warning("Detected Cloudflare verification page. Waiting for resolution...")
+                time.sleep(20)  # Extended wait for JS challenge
+                driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                time.sleep(5)
+                st.write("Updated URL after wait:", driver.current_url)
+                st.write("Updated page title:", driver.title)
+                st.write("Page source (first 1000 chars):", driver.page_source[:1000])
+                if "just a moment" in driver.title.lower():
+                    st.error("Failed to bypass Cloudflare verification.")
+                    return pd.DataFrame()
         
         # with open("page_source_initial.html", "w", encoding="utf-8") as f:
         #     f.write(driver.page_source)
