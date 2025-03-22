@@ -36,7 +36,7 @@ Ensure you have the following installed:
 ```sh
 streamlit run app.py
 ```
-![Run the Application](Images/run app.png)
+![Run the Application](Images/run-app.png)
 ### 2. Enter Company Details
 - Enter the **company name**
 - Specify the number of pages to extract (optional)
