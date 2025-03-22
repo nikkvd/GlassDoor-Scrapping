@@ -1,0 +1,10 @@
+selenium 
+webdriver-manager 
+pandas
+python-dotenv
+streamlit
+langchain
+langchain-google-genai
+nltk 
+vaderSentiment 
+chromedriver-autoinstaller
