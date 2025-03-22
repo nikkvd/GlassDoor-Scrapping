@@ -18,7 +18,7 @@ Ensure you have the following installed:
 - Chrome WebDriver (compatible with your Chrome version)
 - Required Python libraries:
   ```sh
-  pip install streamlit selenium pandas numpy vaderSentiment langchain google-generativeai
+  pip install selenium webdriver-manager pandaspython-dotenvstreamlitlangchainlangchain-google-genainltk vaderSentiment chromedriver-autoinstaller
   ```
 
 ## Step-by-Step Process
