@@ -8,3 +8,4 @@ langchain-google-genai
 nltk 
 vaderSentiment 
 chromedriver-autoinstaller
+seleniumbase
