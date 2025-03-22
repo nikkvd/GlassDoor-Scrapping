@@ -4,21 +4,11 @@
 This is a web application built with Streamlit that performs web scraping and sentiment analysis on Glassdoor reviews of a specified company. The app uses Selenium to extract reviews, VaderSentiment for sentiment analysis, and Google Gemini 1.5 Flash via LangChain to generate insights and recommendations.
 
 ## Features
-- **User Input:**
-  - Company name
-  - Number of pages to scrape (optional, default is 5)
-- **Data Extraction:**
-  - Opens a new window, navigates to Glassdoor, searches for the company, and extracts reviews (title, date, pros, cons, and advice)
-  - Extracted reviews are stored in a Pandas DataFrame
-  - Displays the first 5 records in the Streamlit app
-  - Provides a button to download the entire dataset
-- **Sentiment Analysis:**
-  - Preprocesses the extracted data
-  - Computes sentiment scores for pros, cons, and combined (pros-cons) using VaderSentiment
-  - Displays sentiment scores using circular charts
-- **AI-Powered Insights:**
-  - Uses Google Gemini 1.5 Flash (via LangChain) to generate an overall observation of the company’s reviews and recommendations
-  - Displays the AI-generated insights
+- Web scraping of company reviews from Glassdoor using Selenium.
+- Sentiment analysis of extracted reviews using VaderSentiment.
+- AI-generated insights and recommendations using Google Gemini 1.5 Flash.
+- Interactive visualization of sentiment scores.
+- Download option for the extracted dataset.
 
 ## Installation
 ### Prerequisites
@@ -28,45 +18,73 @@ Ensure you have the following installed:
 - Chrome WebDriver (compatible with your Chrome version)
 - Required Python libraries:
   ```sh
-  pip install streamlit selenium pandas numpy vaderSentiment langchain webdriver-manager python-dotenv langchain-google-genai nltk chromedriver-autoinstaller
+  pip install streamlit selenium pandas numpy vaderSentiment langchain google-generativeai
   ```
 
-## Usage
-### 1. Run the Application
+## Step-by-Step Process
+
+### 1. Start the Application
+Run the following command in your terminal:
 ```sh
 streamlit run app.py
 ```
-![Run the Application](Images/run-app.png)
+
 ### 2. Enter Company Details
-- Enter the **company name**
-- Specify the number of pages to extract (optional)
-- Click the **Extract** button
+- Enter the **company name** in the input field.
+- (Optional) Specify the number of pages to extract (default is 5 pages).
+- Click the **Extract** button.
+![Step1](Images/typed.png)
+
 
 ### 3. Data Extraction Process
-- A new window opens, navigates to Glassdoor, searches for the company, and extracts reviews
-- The window automatically closes after extraction
-- The first 5 reviews are displayed in the Streamlit app
-- A **Download Dataset** button is available
+- A new browser window opens automatically.
+- The application navigates to Glassdoor, searches for the specified company, and clicks on the company name.
+- The browser moves to the **Reviews** section and extracts the following details:
+  - **Title** of the review
+  - **Date** of the review
+  - **Pros** mentioned by employees
+  - **Cons** mentioned by employees
+  - **Advice to Management**
+- The extraction continues until the specified number of pages is reached.
+- Login
+  ![login](Images/login.png)
+- Search
+  ![search](Images/search-result.png)
+- Company Profile
+  ![company](Images/review-tag.png)
+- Review Extraction
+  ![extraction](Images/extraction.png)
+- After completion, the browser window **automatically closes**.
+- The first 5 records of the extracted dataset are displayed in the Streamlit app.
+- A **Download Dataset** button is provided to download the full dataset.
+![extraction_complete](Images/result-extraction.png)
 
 ### 4. Sentiment Analysis
-- The sentiment scores (pros, cons, combined) are calculated
-- Results are displayed in circular charts
+- The extracted reviews are **preprocessed**.
+- Sentiment scores are calculated using **VaderSentiment**:
+  - **Pros Sentiment Score**
+  - **Cons Sentiment Score**
+  - **Combined Score (Pros - Cons)**
+- Sentiment scores are displayed in circular charts.
+![sentiment](Images/result-sentiment-1.png)
 
-### 5. AI-Generated Insights
-- Google Gemini 1.5 Flash generates an overview of the company's reviews
-- Recommendations based on extracted insights are displayed
-
-
+### 5. AI-Generated Insights & Recommendations
+- The application provides the extracted **company name, sentiment scores, pros, cons, and advice** as input to **Google Gemini 1.5 Flash** via **LangChain**.
+- The AI model generates:
+  - An **overall observation** of the company’s reviews.
+  - **Recommendations** based on the extracted insights.
+- The results are displayed in the Streamlit app.
+![observe1](Images/result-sentiment-2.png)
+![observe2](Images/result-sentiment-3.png)
 
 ## Future Improvements
-- Enhance scraping efficiency and bypass bot detection mechanisms
-- Expand sentiment analysis with additional models
-- Improve UI/UX of the Streamlit app
+- Enhance scraping efficiency and bypass bot detection mechanisms.
+- Expand sentiment analysis with additional models.
+- Improve UI/UX of the Streamlit app.
 
 ## License
 This project is licensed under the MIT License.
 
 ---
-**Contributors:** [Your Name]
-
+**Contributors:** [Nikhil Vinod]
 
