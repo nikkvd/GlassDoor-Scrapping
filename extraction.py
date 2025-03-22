@@ -14,9 +14,6 @@ import streamlit as st
 
 
 def scrape_glassdoor_reviews(company_name, email, password,max_page = 5):
-# Debug: Check environment
-    st.write("Current working directory:", os.getcwd())
-    st.write("Chromium version (if available):", os.popen("chromium --version").read() or "Not detected")
 
     # Install ChromeDriver in a writable directory
     chromedriver_dir = "/tmp/chromedriver"
@@ -24,11 +21,8 @@ def scrape_glassdoor_reviews(company_name, email, password,max_page = 5):
         if not os.path.exists(chromedriver_dir):
             os.makedirs(chromedriver_dir)
         chromedriver_path = chromedriver_autoinstaller.install(path=chromedriver_dir)
-        st.write("ChromeDriver installed at:", chromedriver_path)
     except Exception as e:
-        st.error(f"Error installing ChromeDriver: {str(e)}")
         chromedriver_path = "/usr/bin/chromedriver"  # Fallback to system-installed
-        st.write("Falling back to system ChromeDriver:", chromedriver_path)
 
     # Configure Chrome options (default to Chromium in Streamlit Cloud)
     options = webdriver.ChromeOptions()
@@ -48,9 +42,7 @@ def scrape_glassdoor_reviews(company_name, email, password,max_page = 5):
     try:
         service = Service(executable_path=chromedriver_path)
         driver = webdriver.Chrome(service=service, options=options)
-        st.write("WebDriver initialized successfully!")
     except Exception as e:
-        st.error(f"Failed to initialize WebDriver: {str(e)}")
         return pd.DataFrame()
 
     wait = WebDriverWait(driver, 30)
@@ -59,7 +51,7 @@ def scrape_glassdoor_reviews(company_name, email, password,max_page = 5):
         base_url = "https://www.glassdoor.co.in"
         st.write(f"Opening Glassdoor at {base_url}...")
         driver.get(base_url)
-        time.sleep(10)
+        time.sleep(30)
         st.write("Current URL:", driver.current_url)
         st.write("Page title:", driver.title)
 
